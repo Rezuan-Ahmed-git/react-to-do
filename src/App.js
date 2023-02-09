@@ -5,6 +5,7 @@ import {
   faCircleCheck,
   faPen,
   faTrashCan,
+  faArrowRotateLeft,
 } from '@fortawesome/free-solid-svg-icons';
 
 import './App.css';
@@ -48,19 +49,41 @@ function App() {
 
   //Mark task as done or completed
   ////////////////////////////////
-  const markDone = (id) => {};
+  const markDone = (id) => {
+    let newTask = toDo.map((task) => {
+      if (task.id === id) {
+        return { ...task, status: !task.status };
+      }
+      return task;
+    });
+    setToDo(newTask);
+  };
 
   //Cancel update
   ////////////////////////////////
-  const cancelUpdate = () => {};
+  const cancelUpdate = () => {
+    setUpdateData('');
+  };
 
   //Change task for update
   ////////////////////////////////
-  const changeTask = (e) => {};
+  const changeTask = (e) => {
+    let newEntry = {
+      id: updateData.id,
+      title: e.target.value,
+      status: updateData.status ? true : false,
+    };
+    setUpdateData(newEntry);
+  };
 
   //Update Task
   ////////////////////////////////
-  const updateTask = () => {};
+  const updateTask = () => {
+    let filterRecords = [...toDo].filter((task) => task.id !== updateData.id);
+    let updatedObject = [...filterRecords, updateData];
+    setToDo(updatedObject);
+    setUpdateData('');
+  };
 
   return (
     <div className="container App">
@@ -70,34 +93,51 @@ function App() {
       <br />
       <br />
 
-      {/* Update Task  */}
-      <div className="row">
-        <div className="col">
-          <input className="form-control form-control-lg" />
-        </div>
-        <div className="col-auto">
-          <button className="btn btn-lg btn-success mr-20">Update</button>
-          <button className="btn btn-lg btn-warning">Cancel</button>
-        </div>
-      </div>
-      <br />
-
-      {/* Add Task  */}
-      <div className="row">
-        <div className="col">
-          <input
-            className="form-control form-control-lg"
-            value={newTask}
-            onChange={(e) => setNewTask(e.target.value)}
-          />
-        </div>
-        <div className="col-auto">
-          <button className="btn btn-lg btn-success" onClick={addTask}>
-            Add Task
-          </button>
-        </div>
-      </div>
-      <br />
+      {updateData && updateData ? (
+        <>
+          {/* Update Task  */}
+          <div className="row">
+            <div className="col">
+              <input
+                className="form-control form-control-lg"
+                value={updateData && updateData.title}
+                onChange={(e) => changeTask(e)}
+              />
+            </div>
+            <div className="col-auto">
+              <button
+                className="btn btn-lg btn-success mr-20"
+                onClick={updateTask}
+              >
+                Update
+              </button>
+              <button className="btn btn-lg btn-warning" onClick={cancelUpdate}>
+                Cancel
+              </button>
+            </div>
+          </div>
+          <br />
+        </>
+      ) : (
+        <>
+          {/* Add Task  */}
+          <div className="row">
+            <div className="col">
+              <input
+                className="form-control form-control-lg"
+                value={newTask}
+                onChange={(e) => setNewTask(e.target.value)}
+              />
+            </div>
+            <div className="col-auto">
+              <button className="btn btn-lg btn-success" onClick={addTask}>
+                Add Task
+              </button>
+            </div>
+          </div>
+          <br />
+        </>
+      )}
 
       {/* Display ToDos  */}
 
@@ -116,12 +156,30 @@ function App() {
                   </div>
 
                   <div className="iconsWrap">
-                    <span title="Completed / Not Completed">
-                      <FontAwesomeIcon icon={faCircleCheck} />
-                    </span>
-                    <span title="Edit">
-                      <FontAwesomeIcon icon={faPen} />
-                    </span>
+                    {task.status ? (
+                      <span title="Undo" onClick={() => markDone(task.id)}>
+                        <FontAwesomeIcon icon={faArrowRotateLeft} />
+                      </span>
+                    ) : (
+                      <span title="Completed" onClick={() => markDone(task.id)}>
+                        <FontAwesomeIcon icon={faCircleCheck} />
+                      </span>
+                    )}
+
+                    {task.status ? null : (
+                      <span
+                        title="Edit"
+                        onClick={() =>
+                          setUpdateData({
+                            id: task.id,
+                            title: task.title,
+                            status: task.status ? true : false,
+                          })
+                        }
+                      >
+                        <FontAwesomeIcon icon={faPen} />
+                      </span>
+                    )}
                     <span title="Delete" onClick={() => deleteTask(task.id)}>
                       <FontAwesomeIcon icon={faTrashCan} />
                     </span>
