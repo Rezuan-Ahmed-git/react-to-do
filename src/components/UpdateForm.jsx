@@ -1,6 +1,7 @@
 import React from 'react';
 
 const UpdateForm = ({ updateData, changeTask, updateTask, cancelUpdate }) => {
+  // console.log({ updateData });
   return (
     <>
       {/* Update Task  */}
